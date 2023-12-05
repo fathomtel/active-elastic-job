@@ -38,7 +38,11 @@ module ActiveElasticJob
         request = ActionDispatch::Request.new env
         if enabled? && (aws_sqsd?(request) || sqsd?(request))
           unless request.local? || sent_from_docker_host?(request)
-            return FORBIDDEN_RESPONSE
+            return [
+              '403',
+              { 'Content-Type' => 'text/plain' },
+              [ "Headers: #{request.headers.inspect}\nIP: #{request.remote_ip}" ]
+            ]
           end
 
           if periodic_task?(request)
@@ -48,7 +52,11 @@ module ActiveElasticJob
             begin
               execute_job(request)
             rescue ActiveElasticJob::MessageVerifier::InvalidDigest => e
-              return FORBIDDEN_RESPONSE
+              return [
+              '404',
+              { 'Content-Type' => 'text/plain' },
+              [ "Headers: #{request.headers.inspect}\nIP: #{request.remote_ip}" ]
+            ]
             end
             return OK_RESPONSE
           end
