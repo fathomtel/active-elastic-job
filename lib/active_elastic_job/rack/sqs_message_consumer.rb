@@ -41,7 +41,7 @@ module ActiveElasticJob
             return [
               '403',
               { 'Content-Type' => 'text/plain' },
-              [ "Headers: #{request.headers.inspect}\nIP: #{request.remote_ip}" ]
+              [ "Local: #{request.local?}\nDocker: #{sent_from_docker_host?(request}" ]
             ]
           end
 
@@ -52,11 +52,7 @@ module ActiveElasticJob
             begin
               execute_job(request)
             rescue ActiveElasticJob::MessageVerifier::InvalidDigest => e
-              return [
-              '404',
-              { 'Content-Type' => 'text/plain' },
-              [ "Headers: #{request.headers.inspect}\nIP: #{request.remote_ip}" ]
-            ]
+              return FORBIDDEN_RESPONSE
             end
             return OK_RESPONSE
           end
