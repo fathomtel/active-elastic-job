@@ -41,7 +41,7 @@ module ActiveElasticJob
             return [
               '403',
               { 'Content-Type' => 'text/plain' },
-              [ "Local: #{request.local?}\nDocker: #{sent_from_docker_host?(request}" ]
+              [ "Local: #{request.local?}\nDocker: #{sent_from_docker_host?(request}}" ]
             ]
           end
 
