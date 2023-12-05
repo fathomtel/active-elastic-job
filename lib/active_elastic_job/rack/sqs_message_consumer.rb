@@ -41,7 +41,7 @@ module ActiveElasticJob
             return [
               '403',
               { 'Content-Type' => 'text/plain' },
-              [ "Local: #{request.local?}\nDocker: #{sent_from_docker_host?(request)}" ]
+              [ "HTTP_CLIENT_IP: #{request.headers['HTTP_CLIENT_IP']}, HTTP_X_FORWARDED_FOR: #{request.headers['HTTP_X_FORWARDED_FOR']}, HTTP_X_REAL_IP: #{request.headers['HTTP_X_REAL_IP']}, request.remote_ip: #{request.remote_ip}, request.remote_addr: #{request.remote_addr}" ]
             ]
           end
 
