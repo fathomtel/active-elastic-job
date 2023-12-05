@@ -38,11 +38,7 @@ module ActiveElasticJob
         request = ActionDispatch::Request.new env
         if enabled? && (aws_sqsd?(request) || sqsd?(request))
           unless request.local? || sent_from_docker_host?(request)
-            return [
-              '403',
-              { 'Content-Type' => 'text/plain' },
-              [ "HTTP_CLIENT_IP: #{request.headers['HTTP_CLIENT_IP']}, HTTP_X_FORWARDED_FOR: #{request.headers['HTTP_X_FORWARDED_FOR']}, HTTP_X_REAL_IP: #{request.headers['HTTP_X_REAL_IP']}, request.remote_ip: #{request.remote_ip}, request.remote_addr: #{request.remote_addr}" ]
-            ]
+            return FORBIDDEN_RESPONSE
           end
 
           if periodic_task?(request)
@@ -145,7 +141,7 @@ module ActiveElasticJob
       end
 
       def app_runs_in_docker_container?
-        (`[ -f /proc/1/cgroup ] && cat /proc/1/cgroup` =~ /(ecs|docker)/).present?
+        File.exist?('/.dockerenv') || (`[ -f /proc/1/cgroup ] && cat /proc/1/cgroup` =~ /(ecs|docker)/).present?
       end
     end
   end
